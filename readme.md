@@ -31,3 +31,10 @@ forwarded to your rocket.chat live-messages. But the messages sent from rocket-c
 reach your whatsapp number. To solve this, you need to configure rocket.chat's live message
 webhooks found under omnichannel > webhooks > send request for agent's messages. 
 Your webhook url should look like ```https://your-domain-name.com/msg_snd```.
+
+## TODO:
+[v] Send text messages from WhatApp to Rocket.Chat
+[v] Send text messages from Rocket.chat to WhatsApp
+[v] Send media messages from Rocket.chat to WhatApp (currently only images)
+[ ] Send media messages from WhatsApp to Rocket.Chat
+[ ] Integrate with other APIs. (e.g., [Wassenger](https://www.wassenger.com/))
