@@ -22,8 +22,12 @@ To run this project you will need:
 Once you have all of the items above, you can edit the constants.py file and add your chat-api
 instance number, rocket chat url etc.
 
+Go to your [chat api dashboard](https://app.chat-api.com/dashboard), and under Instance settings,
+configure the webhook to ```https://your-domain-name.com/msg_recv```. This is the endpoint that 
+awaits for a post message from chat-api, and forwards it to rocket.chat.
 
-Once you edit your contants.py, every message sent to your chat-api whatsapp number should be
+Now every message sent to your chat-api whatsapp number should be
 forwarded to your rocket.chat live-messages. But the messages sent from rocket-chat will not 
 reach your whatsapp number. To solve this, you need to configure rocket.chat's live message
-webhooks found under omnichannel > webhooks > send request for agent's messages.
+webhooks found under omnichannel > webhooks > send request for agent's messages. 
+Your webhook url should look like ```https://your-domain-name.com/msg_snd```.
