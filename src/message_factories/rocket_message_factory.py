@@ -10,9 +10,15 @@ class RocketMessageFactory:
         }
 
     def __build_media_message(self):
-        file_url = CHAT_GET_FILE.format(INSTANCE_ID, self.message["id"], self.message["type"], CHAT_API_TOKEN_MD5)
-        file = requests.get(file_url)
-        return file
+        get_file_endpoint = CHAT_API_URL + CHAT_GET_FILE.format(self.message["id"], CHAT_API_TOKEN)
+        file = requests.get(get_file_endpoint)
+        media_url = json.loads(file.text)["url"]
+        body = "{}\n{}".format(self.message["body"], media_url)
+        return {
+            "token": self.visitor["visitor"]["token"],
+            "rid": self.room["_id"],
+            "msg": body,
+        }
 
 
     def __init__(self, message, room, visitor):
