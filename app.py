@@ -101,6 +101,7 @@ def msg_recv():
 
 
             room = requests.get(url=get_room_url(rid))
+            print(json.loads(rooms.text))
             room = json.loads(room.text)["room"]
 
             if room["_id"] != rid:
