@@ -10,6 +10,7 @@ from src.urls.rocket_chat_urls import *
 
 app = Flask(__name__)
 
+
 @app.route('/msg_snd', methods=["GET", "POST"])
 def msg_snd():
     if request.method == 'POST':
@@ -73,17 +74,13 @@ def msg_recv():
             # So we ignore anything that is not zero to avoid
             # sending duplicate messages to rocket chat.
             if "ack" in message and message["ack"] != 0 and message["ack"] != 1:
-                print("this was an ack message {}".format(message["ack"]))
                 return "ACK MESSAGE"
-
-            print(message)
 
             # register visitor in rocket chat
             visitor_dict = create_visitor(message)
             register_visitor_request = requests.post(
                 url=get_visitor_url(), data=json.dumps(visitor_dict))
             visitor = json.loads(register_visitor_request.text)
-
 
             room = requests.get(url=get_room_url(message))
             room = json.loads(room.text)["room"]
@@ -92,14 +89,15 @@ def msg_recv():
             message_factory = RocketMessageFactory(message, room, visitor)
             converted_message = message_factory.build()
 
-            print(converted_message)
-
             headers = {
                 "Content-Type": "application/json"
             }
 
             response = requests.post(url=get_rocket_message_url(
             ), data=json.dumps(converted_message), headers=headers)
+
+            print("\n\n\nPayload: {}\nResponse: {}\n\n\n".format(
+                converted_message, converted_message))
 
     return(response.text)
 
