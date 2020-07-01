@@ -100,8 +100,7 @@ def msg_recv():
                 print("rid: {} read from file.".format(rid))
 
             
-            room = requests.get(url=get_room_url(rid))
-            print(json.loads(rooms.text))
+            room = requests.get(url=get_room_url(visitor_token, rid))
             room = json.loads(room.text)["room"]
 
             if room["_id"] != rid:
