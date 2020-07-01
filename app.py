@@ -99,14 +99,16 @@ def msg_recv():
                 visitor_file.close()
                 print("rid: {} read from file.".format(rid))
 
-
+            
             room = requests.get(url=get_room_url(rid))
             print(json.loads(rooms.text))
             room = json.loads(room.text)["room"]
 
             if room["_id"] != rid:
+                print("room id: {} is different from previous id {}".format(room["_id"], rid))
                 visitor_file = open("visitor_map/{}".format(visitor_token), "w")
                 visitor_file.write(room["_id"])
+                print("written {} to visitor_map/{}".format(room["_id"], visitor_token))
                 visitor_file.close()
 
 
