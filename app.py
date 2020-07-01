@@ -7,8 +7,10 @@ from src.message_factories.chat_api_message_factory import ChatApiMessageFactory
 from src.message_factories.rocket_message_factory import RocketMessageFactory
 from src.urls.chat_api_urls import chat_api_url_factory
 from src.urls.rocket_chat_urls import *
+from src.visitor_management.visitor_map import *
 
 app = Flask(__name__)
+
 
 @app.route('/msg_snd', methods=["GET", "POST"])
 def msg_snd():
@@ -73,26 +75,30 @@ def msg_recv():
             # So we ignore anything that is not zero to avoid
             # sending duplicate messages to rocket chat.
             if "ack" in message and message["ack"] != 0 and message["ack"] != 1:
-                print("this was an ack message {}".format(message["ack"]))
                 return "ACK MESSAGE"
-
-            print(message)
 
             # register visitor in rocket chat
             visitor_dict = create_visitor(message)
             register_visitor_request = requests.post(
                 url=get_visitor_url(), data=json.dumps(visitor_dict))
             visitor = json.loads(register_visitor_request.text)
+            visitor_token = visitor["visitor"]["token"]
 
-
-            room = requests.get(url=get_room_url(message))
+            # Check if a file has already ben created for this visitor.
+            # The file should contain his last rocket chat livechat room id.
+            rid = create_visitor_rid_file(visitor)
+            
+            room = requests.get(url=get_room_url(visitor_token, rid))
             room = json.loads(room.text)["room"]
+
+            # If the last room the visitor interacted with was closed, update
+            # the file with the new rid, so that the next message will be 
+            # forwarded correctly.
+            update_visitor_rid_file(visitor_token, room, rid)
 
             # Use a message factory to create the fitting message object
             message_factory = RocketMessageFactory(message, room, visitor)
             converted_message = message_factory.build()
-
-            print(converted_message)
 
             headers = {
                 "Content-Type": "application/json"
@@ -100,6 +106,7 @@ def msg_recv():
 
             response = requests.post(url=get_rocket_message_url(
             ), data=json.dumps(converted_message), headers=headers)
+
 
     return(response.text)
 
