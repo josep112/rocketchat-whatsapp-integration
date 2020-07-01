@@ -82,8 +82,32 @@ def msg_recv():
                 url=get_visitor_url(), data=json.dumps(visitor_dict))
             visitor = json.loads(register_visitor_request.text)
 
-            room = requests.get(url=get_room_url(message))
+            visitor_token = visitor["visitor"]["token"]
+            try:
+                visitor_file = open("visitor_map/{}".format(visitor_token), "r")
+                print("\nfile {} existed\n".format(visitor_token))
+            #file does not exist
+            except:
+                print("\nfile {} did not exist. Creating...\n".format(visitor_token))
+                visitor_file = open("visitor_map/{}".format(visitor_token), "w")
+                visitor_file.write(visitor_token)
+                visitor_file.close()
+                print("created")
+                visitor_file = open("visitor_map/{}".format(visitor_token), "r")
+            finally:
+                rid = visitor_file.read()
+                visitor_file.close()
+                print("rid: {} read from file.".format(rid))
+
+
+            room = requests.get(url=get_room_url(rid))
             room = json.loads(room.text)["room"]
+
+            if room["_id"] != rid:
+                visitor_file = open("visitor_map/{}".format(visitor_token))
+                visitor_file.write(rid)
+                visitor_file.close()
+
 
             # Use a message factory to create the fitting message object
             message_factory = RocketMessageFactory(message, room, visitor)
@@ -96,8 +120,6 @@ def msg_recv():
             response = requests.post(url=get_rocket_message_url(
             ), data=json.dumps(converted_message), headers=headers)
 
-            print("\n\n\nPayload: {}\nResponse: {}\n\n\n".format(
-                converted_message, converted_message))
 
     return(response.text)
 
