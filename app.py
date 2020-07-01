@@ -7,6 +7,7 @@ from src.message_factories.chat_api_message_factory import ChatApiMessageFactory
 from src.message_factories.rocket_message_factory import RocketMessageFactory
 from src.urls.chat_api_urls import chat_api_url_factory
 from src.urls.rocket_chat_urls import *
+from src.visitor_management.visitor_map import *
 
 app = Flask(__name__)
 
@@ -82,34 +83,17 @@ def msg_recv():
                 url=get_visitor_url(), data=json.dumps(visitor_dict))
             visitor = json.loads(register_visitor_request.text)
 
-            visitor_token = visitor["visitor"]["token"]
-            try:
-                visitor_file = open("visitor_map/{}".format(visitor_token), "r")
-                print("\nfile {} existed\n".format(visitor_token))
-            #file does not exist
-            except:
-                print("\nfile {} did not exist. Creating...\n".format(visitor_token))
-                visitor_file = open("visitor_map/{}".format(visitor_token), "w")
-                visitor_file.write(visitor_token)
-                visitor_file.close()
-                print("created")
-                visitor_file = open("visitor_map/{}".format(visitor_token), "r")
-            finally:
-                rid = visitor_file.read()
-                visitor_file.close()
-                print("rid: {} read from file.".format(rid))
-
+            # Check if a file has already ben created for this visitor.
+            # The file should contain his last rocket chat livechat room id.
+            rid = create_visitor_rid_file(visitor)
             
             room = requests.get(url=get_room_url(visitor_token, rid))
             room = json.loads(room.text)["room"]
 
-            if room["_id"] != rid:
-                print("room id: {} is different from previous id {}".format(room["_id"], rid))
-                visitor_file = open("visitor_map/{}".format(visitor_token), "w")
-                visitor_file.write(room["_id"])
-                print("written {} to visitor_map/{}".format(room["_id"], visitor_token))
-                visitor_file.close()
-
+            # If the last room the visitor interacted with was closed, update
+            # the file with the new rid, so that the next message will be 
+            # forwarded correctly.
+            update_visitor_rid_file(room, rid)
 
             # Use a message factory to create the fitting message object
             message_factory = RocketMessageFactory(message, room, visitor)
