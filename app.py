@@ -82,7 +82,7 @@ def msg_recv():
             register_visitor_request = requests.post(
                 url=get_visitor_url(), data=json.dumps(visitor_dict))
             visitor = json.loads(register_visitor_request.text)
-            visitor_token = visitor["token"]
+            visitor_token = visitor["visitor"]["token"]
 
             # Check if a file has already ben created for this visitor.
             # The file should contain his last rocket chat livechat room id.
