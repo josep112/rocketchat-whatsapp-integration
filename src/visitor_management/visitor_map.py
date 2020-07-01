@@ -13,7 +13,7 @@ def create_visitor_rid_file(visitor):
         visitor_file.close()
         return rid
 
-def update_visitor_rid_file(room, rid):
+def update_visitor_rid_file(visitor_token, room, rid):
     if room["_id"] != rid:
         visitor_file = open("visitor_map/{}".format(visitor_token), "w")
         visitor_file.write(room["_id"])

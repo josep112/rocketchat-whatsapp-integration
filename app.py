@@ -94,7 +94,7 @@ def msg_recv():
             # If the last room the visitor interacted with was closed, update
             # the file with the new rid, so that the next message will be 
             # forwarded correctly.
-            update_visitor_rid_file(room, rid)
+            update_visitor_rid_file(visitor_token, room, rid)
 
             # Use a message factory to create the fitting message object
             message_factory = RocketMessageFactory(message, room, visitor)
