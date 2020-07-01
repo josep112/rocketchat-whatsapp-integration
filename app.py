@@ -104,7 +104,7 @@ def msg_recv():
             room = json.loads(room.text)["room"]
 
             if room["_id"] != rid:
-                visitor_file = open("visitor_map/{}".format(visitor_token, "r"))
+                visitor_file = open("visitor_map/{}".format(visitor_token, "w"))
                 visitor_file.write(rid)
                 visitor_file.close()
 
