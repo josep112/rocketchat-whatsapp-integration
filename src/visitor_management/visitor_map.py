@@ -1,5 +1,12 @@
+import os
+
 def create_visitor_rid_file(visitor):
     visitor_token = visitor["visitor"]["token"]
+
+    visitor_folder_path = os.path.join(os.getcwd(), "visitor_map")
+    if not os.path.isdir(visitor_folder_path):
+        os.makedirs(visitor_folder_path)
+
     try:
         visitor_file = open("visitor_map/{}".format(visitor_token), "r")
     #file does not exist
